@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zeyada App Prototype</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Added a subtle gradient background */
+            background: linear-gradient(to bottom right, #e0f2fe, #ffffff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
+        }
+        .mobile-frame {
+            width: 100%;
+            max-width: 400px; /* Typical mobile width */
+            height: 800px; /* Typical mobile height */
+            background-color: white;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+        .screen {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: transform 0.4s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto; /* Enable scrolling for vertical content */
+            /* Initially hide screens off-screen and set display to none */
+            transform: translateX(100%);
+            display: none;
+        }
+        .screen.active-screen {
+            transform: translateX(0);
+            display: flex; /* Ensure active screen is displayed */
+        }
+         /* Add styles for sliding out */
+        .screen.slide-out-left {
+            transform: translateX(-100%);
+        }
+        .screen.slide-out-right {
+            transform: translateX(100%);
+        }
+
+
+        .zeyada-blue {
+            background-color: #0052cc; /* Example Zeyada Blue */
+            color: white;
+        }
+        .zeyada-text-blue {
+             color: #0052cc; /* Example Zeyada Blue */
+        }
+        .rounded-card {
+            border-radius: 15px;
+            /* Added subtle shadow */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+        }
+        .btn {
+            padding: 12px 20px;
+            border-radius: 25px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease, box-shadow 0.2s ease; /* Added box-shadow to transition */
+        }
+        .btn-primary {
+            /* Added a subtle gradient to primary buttons */
+            background: linear-gradient(to right, #0052cc, #003f9e);
+            color: white;
+             border: none; /* Remove default border */
+             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Added shadow to buttons */
+        }
+        .btn-primary:hover {
+            background: linear-gradient(to right, #003f9e, #002a6b);
+             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Darker shadow on hover */
+        }
+        .btn-secondary {
+            background-color: #e0e0e0;
+            color: #333;
+             border: none; /* Remove default border */
+             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* Added subtle shadow to secondary buttons */
+        }
+         .btn-secondary:hover {
+            background-color: #d5d5d5;
+             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Darker shadow on hover */
+         }
+        .input-field {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            width: 100%;
+            box-sizing: border-box;
+             box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05); /* Inner shadow for input fields */
+        }
+         .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px 15px 10px;
+            width: 100%;
+         }
+         .grid-item {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease; /* Added box-shadow to transition */
+            /* Added subtle shadow */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+         }
+         .grid-item:hover {
+            background-color: #eee;
+             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Darker shadow on hover */
+         }
+         .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            cursor: pointer; /* Make transaction items clickable */
+         }
+         /* Style for vertical station items */
+         .station-vertical-item {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px; /* Space between vertical items */
+            display: flex;
+            flex-direction: column;
+            cursor: pointer; /* Keep cursor pointer for the whole item */
+            transition: background-color 0.2s ease, box-shadow 0.2s ease; /* Added box-shadow to transition */
+            /* Added subtle shadow */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+         }
+          .station-vertical-item:hover {
+            background-color: #eee;
+             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Darker shadow on hover */
+         }
+         .station-vertical-item .details-link {
+             text-align: right; /* Align link to the right */
+             font-size: 0.8rem; /* Smaller font size for link */
+             color: #0052cc; /* Zeyada blue for link */
+             cursor: pointer; /* Ensure link is clickable */
+             margin-top: 8px; /* Space above the link */
+             display: block; /* Make the link a block element */
+         }
+        /* Style for the fuel type/offer tags within station items */
+        .station-item-tags {
+            display: flex;
+            flex-wrap: wrap; /* Allow tags to wrap */
+            gap: 5px; /* Space between tags */
+            margin-bottom: 8px; /* Space below tags */
+        }
+        .station-item-tags span {
+            font-size: 0.75rem; /* Smaller font size for tags */
+            padding: 3px 8px;
+            border-radius: 15px;
+        }
+
+
+         .language-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+         }
+         .language-toggle span {
+            margin: 0 10px;
+            cursor: pointer;
+            font-weight: 500;
+         }
+         .language-toggle span.active {
+            font-weight: 700;
+            color: #0052cc;
+         }
+        .feature-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        .feature-item:last-child {
+            border-bottom: none;
+        }
+        .logo-img {
+            width: 60px; /* Adjust size as needed */
+            height: auto;
+        }
+         .logo-img-small {
+            width: 30px; /* Adjust size as needed for top bar */
+            height: auto;
+         }
+         .top-bar-icons i {
+            cursor: pointer;
+         }
+         .amount-option {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease; /* Added box-shadow to transition */
+             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+         }
+         .amount-option:hover {
+            background-color: #f0f0f0;
+             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Darker shadow on hover */
+         }
+         .amount-option.selected {
+             background-color: #0052cc;
+             color: white;
+             border-color: #0052cc;
+             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* More prominent shadow when selected */
+         }
+         /* Style for the map placeholder */
+         .map-placeholder {
+            width: 100%;
+            height: 100%; /* Make map fill the available space */
+            background-color: #e0e0e0; /* Grey background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            color: #666;
+            border-radius: 10px;
+            overflow: hidden; /* Ensure image stays within bounds */
+         }
+         .map-placeholder img {
+             width: 100%;
+             height: 100%;
+             object-fit: cover; /* Cover the area without distortion */
+         }
+
+         /* Style for vertical scrolling container */
+         .vertical-scroll-container {
+             display: flex;
+             flex-direction: column; /* Stack items vertically */
+             overflow-y: auto; /* Enable vertical scrolling */
+             padding-right: 5px; /* Add some padding for scrollbar */
+             -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+             scrollbar-width: thin;  /* Style scrollbar for Firefox */
+             scrollbar-color: #ccc transparent; /* Scrollbar color for Firefox */
+         }
+          .vertical-scroll-container::-webkit-scrollbar {
+             width: 5px; /* Width of the scrollbar */
+         }
+          .vertical-scroll-container::-webkit-scrollbar-track {
+             background: transparent; /* Track color */
+         }
+          .vertical-scroll-container::-webkit-scrollbar-thumb {
+             background-color: #ccc; /* Thumb color */
+             border-radius: 10px; /* Rounded corners for thumb */
+         }
+
+
+          /* Style for facility icons */
+         .facility-icon {
+             font-size: 1.5rem;
+             margin-right: 10px;
+             color: #0052cc; /* Zeyada blue for icons */
+         }
+
+         /* Style for filter section */
+         .filter-container {
+             margin-bottom: 20px;
+             background-color: #fff;
+             border-radius: 10px;
+             padding: 15px;
+             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+         }
+         .filter-header {
+             display: flex;
+             justify-content: space-between;
+             align-items: center;
+             cursor: pointer;
+         }
+         .filter-options {
+             display: flex;
+             flex-wrap: wrap;
+             gap: 10px;
+             margin-top: 15px;
+             /* Initially hidden */
+             max-height: 0;
+             overflow: hidden;
+             transition: max-height 0.3s ease-in-out;
+         }
+         .filter-options.expanded {
+             max-height: 200px; /* Adjust based on expected content height */
+         }
+         .filter-button {
+             padding: 8px 12px;
+             border: 1px solid #ccc;
+             border-radius: 20px;
+             cursor: pointer;
+             font-size: 0.9rem;
+             transition: background-color 0.2s ease, border-color 0.2s ease;
+         }
+         .filter-button.active {
+             background-color: #0052cc;
+             color: white;
+             border-color: #0052cc;
+         }
+
+        /* Style for fuel type selection */
+        .fuel-type-option {
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease; /* Added box-shadow to transition */
+             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+        }
+        .fuel-type-option:hover {
+            background-color: #f0f0f0;
+             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Darker shadow on hover */
+        }
+        .fuel-type-option.selected {
+            background-color: #0052cc;
+            color: white;
+            border-color: #0052cc;
+             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* More prominent shadow when selected */
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="mobile-frame">
+
+        <div id="splash-screen" class="screen active-screen justify-center items-center text-center zeyada-blue">
+            <img src="https://placehold.co/60x60/ffffff/0052cc?text=Logo" alt="Zeyada Logo" class="logo-img mb-4">
+            <h1 class="text-3xl font-bold mb-2">Zeyada</h1>
+            <p class="text-xl mb-6">Refuel Smarter. Earn More.</p>
+            <div class="w-16 h-16 border-4 border-t-4 border-white border-opacity-30 rounded-full animate-spin"></div>
+        </div>
+
+        <div id="welcome-screen" class="screen justify-between items-center text-center">
+            <div>
+                <img src="https://placehold.co/60x60/ffffff/0052cc?text=Logo" alt="Zeyada Logo" class="logo-img mb-4 mx-auto">
+                <h1 class="text-3xl font-bold mb-4">Your Fuel, Your Wallet, Your Rewards</h1>
+                <p class="text-lg text-gray-600 mb-8">Scan, pay, and earn every time you refuel.</p>
+            </div>
+             <div class="w-full">
+                <button class="btn btn-primary w-full mb-4" onclick="goToScreen(\'login-screen\')">Get Started</button>
+                <p class="text-sm text-gray-600">Already have an account? <span class="zeyada-text-blue font-semibold cursor-pointer" onclick="goToScreen(\'login-screen\')">Log In</span></p>
+                 <div class="language-toggle">
+                    <span class="active">🇸🇦 Arabic</span> | <span>English 🇬🇧</span>
+                </div>
+             </div>
+        </div>
+
+        <div id="login-screen" class="screen justify-start items-center">
+             <div class="top-bar">
+                <i class="fas fa-arrow-left text-gray-600 text-xl cursor-pointer" onclick="goToScreen(\'welcome-screen\')"></i>
+                <div></div> </div>
+            <h2 class="text-2xl font-bold mb-6 w-full">Log In or Sign Up</h2>
+
+            <button class="btn btn-primary w-full mb-4" onclick="goToScreen(\'customer-login-options-screen\')">Log in as Customer</button>
+            <button class="btn btn-secondary w-full mb-4" onclick="goToScreen(\'operator-login-screen\')">Log in as Operator</button>
+
+            <p class="text-sm text-gray-600 text-center w-full mt-auto">New Customer? <span class="zeyada-text-blue font-semibold cursor-pointer" onclick="goToScreen(\'customer-login-options-screen\')">Sign Up</span></p>
+
+        </div>
+
+         <div id="customer-login-options-screen" class="screen justify-start items-center">
+             <div class="top-bar">
+                <i class="fas fa-arrow-left text-gray-600 text-xl cursor-pointer" onclick="goToScreen(\'login-screen\')"></i>
+                <div></div> </div>
+            <h2 class="text-2xl font-bold mb-6 w-full">Customer Log In / Sign Up</h2>
+
+            <input type="text" class="input-field" placeholder="Phone Number or Email">
+            <button class="btn btn-primary w-full mb-4" onclick="goToScreen(\'otp-screen\')">Continue with Phone/Email</button>
+
+            <div class="w-full text-center text-gray-500 my-4">- OR -</div>
+
+            <button class="btn btn-secondary w-full mb-4" onclick="goToScreen(\'nafath-login-screen\')">
+                <i class="fas fa-id-card-alt mr-2"></i> Sign in with NAFATH
+            </button>
+      
+(Content truncated due to size limit. Use line ranges to read in chunks)
